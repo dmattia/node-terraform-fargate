@@ -1,7 +1,3 @@
-locals {
-    container_name = "example_app_container"
-}
-
 resource "aws_ecs_task_definition" "backend_task" {
     family = "${var.ecs_family}"
 
@@ -14,12 +10,12 @@ resource "aws_ecs_task_definition" "backend_task" {
     cpu = "256"
 
     // Fargate reqjuires task definitions to have an execution role ARN to support ECR images
-    execution_role_arn = "${aws_iam_policy.ecr_read.arn}"
+    execution_role_arn = "${aws_iam_role.ecs_role.arn}"
 
     container_definitions = <<EOT
 [
     {
-        "name": "${local.container_name}",
+        "name": "example_app_container",
         "image": "468964582991.dkr.ecr.eu-west-1.amazonaws.com/ecr_example_app:latest",
         "memory": 512,
         "essential": true,
@@ -53,49 +49,3 @@ resource "aws_ecs_service" "backend_service" {
         assign_public_ip = true
     }
 }
-
-resource "aws_iam_policy" "ecr_read" {
-    name = "ecr_read_policy_example_app"
-    path = "/ecr/"
-
-    policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Resource": "*",
-      "Action": [
-        "sts:AssumeRole",
-        "ecr:GetAuthorizationToken",
-        "ecr:BatchCheckLayerAvailability",
-        "ecr:BatchGetImage",
-        "ecr:GetDownloadUrlForLayer"
-      ]
-    }
-  ]
-}
-EOF
-}
-
-/*
-resource "aws_iam_role" "ecs_role" {
-    name = "ecs_role"
-
-    assume_role_policy = <<POLICY
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Sid": "",
-      "Effect": "Allow",
-      "Principal": {
-        "Service": "ecs-tasks.amazonaws.com"
-      },
-      "Action": "sts:AssumeRole"
-    }
-  ]
-}
-POLICY
-}
-*/

@@ -6,8 +6,17 @@ resource "aws_vpc" "vpc_example_app" {
 
 resource "aws_subnet" "public" {
     vpc_id = "${aws_vpc.vpc_example_app.id}"
-    cidr_block = "10.0.0.0/16"
-    map_public_ip_on_launch = true
+    cidr_block = "10.0.0.0/24"
+}
+
+resource "aws_internet_gateway" "internet_gateway" {
+    vpc_id = "${aws_vpc.vpc_example_app.id}"
+}
+
+resource "aws_route" "internet_access" {
+    route_table_id = "${aws_vpc.vpc_example_app.main_route_table_id}"
+    destination_cidr_block = "0.0.0.0/0"
+    gateway_id = "${aws_internet_gateway.internet_gateway.id}"
 }
 
 resource "aws_security_group" "security_group_example_app" {
