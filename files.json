@@ -1,0 +1,19 @@
+{
+	"files": [
+    {
+      "filename": "NYT.txt",
+      "mime": "text/plain",
+      "authTag": "gadZhS1QozjEmfmHLblzbg=="
+    },
+    {
+      "filename": "patreon.mp4",
+      "mime": "video/mp4",
+      "authTag": "Mqgmwj9IvLEeBjhwrkYpBg=="
+    },
+  	{
+      "filename": "Earth.jpg",
+      "mime": "image/jpeg",
+      "authTag": "v86dSoD5yu4iaDZdPYWTDA=="
+    }
+  ]
+}
