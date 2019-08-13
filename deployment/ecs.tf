@@ -9,7 +9,7 @@ resource "aws_ecs_task_definition" "backend_task" {
     memory = "512"
     cpu = "256"
 
-    // Fargate reqjuires task definitions to have an execution role ARN to support ECR images
+    // Fargate requires task definitions to have an execution role ARN to support ECR images
     execution_role_arn = "${aws_iam_role.ecs_role.arn}"
 
     container_definitions = <<EOT
@@ -23,6 +23,41 @@ resource "aws_ecs_task_definition" "backend_task" {
             {
                 "containerPort": 3000,
                 "hostPort": 3000
+            }
+        ]
+    },
+    {
+        "name": "datadog-agent",
+        "image": "datadog/agent:latest",
+        "essential": true,
+        "environment": [
+            {
+                "name": "DD_API_KEY",
+                "value": "${var.datadog_api_key}"
+            },
+            {
+                "name": "ECS_FARGATE",
+                "value": "true"
+            },
+            {
+                "name": "DD_APM_ENABLED",
+                "value": "true"
+            },
+            {
+                "name": "DD_LOGS_ENABLED",
+                "value": "true"
+            },
+            {
+                "name": "DD_PROCESS_AGENT_ENABLED",
+                "value": "true"
+            },
+            {
+                "name": "DD_DOGSTATSD_NON_LOCAL_TRAFFIC",
+                "value": "true"
+            },
+            {
+                "name": "DD_DOCKER_ENV_AS_TAGS",
+                "value": "true"
             }
         ]
     }
@@ -44,7 +79,7 @@ resource "aws_ecs_service" "backend_service" {
     desired_count = 1
 
     network_configuration {
-        subnets = ["${aws_subnet.public.id}"]
+        subnets = ["${aws_subnet.public_a.id}", "${aws_subnet.public_b.id}"]
         security_groups = ["${aws_security_group.security_group_example_app.id}"]
         assign_public_ip = true
     }
